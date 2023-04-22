@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct Trie {
+  int flag;
+  struct Trie *children[26];
+}Trie;
+
+void insert(struct Trie **ppTrie, char *word){
+  if(ppTrie == NULL){
+    return;
+  }
+  Trie *tmp = *ppTrie; //make tmp pointer to traverse through the trie
+  int length = strlen(word); //establishes the length into an index to decrease run time
+  for(int i = 0; i <length; i++){
+    int index = word[i] - 'a'; //this is how we find the index
+    if(tmp->children[index] == NULL){
+      tmp -> children[index] = calloc(1, sizeof(Trie)); //allocates memory for 1 spot so we don't have memory leaks
+    }
+    tmp = tmp -> children[index]; //moves down the trie
+    }
+  tmp->flag++; //shows that we have a word there
+  }
+
+
+int numberOfOccurances(struct Trie *pTrie, char *word){
+  if(pTrie == NULL){
+    return NULL;
+  }
+  Trie *tmp = pTrie;
+  int length = strlen(word);
+  for(int i = 0; i <length; i++){
+    int index = word[i] -'a';//use equation word - 'a'
+    if(tmp->children[index] == NULL){
+      return 0;
+    }
+    tmp = tmp -> children[index]; //
+  }
+  return tmp->flag; //checks the count of the word recorded by flag
+}
+
+struct Trie *deallocateTrie(struct Trie *pTrie){
+
+  int i;
+  
+  if(pTrie == NULL){ //checks to see if trie is full (no deallocate if 
+    return NULL;     //true
+  }
+  for(i=0; i<26; i++){    //goes through every children
+    free(pTrie->children[i]); //frees the child from the tree
+  }
+  free(pTrie); //frees pTrie once all children are gone
+              //prevents memory leak
+
+  return NULL; //returns NULL because no trie is left
+}
+
+
+int main(void)
+{
+      Trie *trie = calloc(1,sizeof(Trie)); //initialize trie (use calloc)
+      char *pWords[] = {"notaword", "ucf", "no", "note", "corg"};
+      for(int i = 0; i < 5; i++){
+        insert(&trie, pWords[i]); //adding words to trie
+      }
+      for (int i=0;i<5;i++)
+      {
+          printf("\t%s : %d\n",pWords[i], numberOfOccurances(trie, pWords[i]));
+     }
+    trie = deallocateTrie(trie);
+    if (trie != NULL)
+       printf("There is an error in this program\n");
+    return 0;
+}
